@@ -1,0 +1,16 @@
+!!! 5
+%html(lang="en")
+  %head
+    %meta(charset="utf-8")
+    %meta(http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1")
+    %meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    %title HAWK
+    %script{src: 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js'}
+    %script{src: 'javascript/speech_recognition.js'}
+    %script{src: 'javascript/recorder.js'}
+    %link{:rel => 'stylesheet', :type => 'text/css', :href => '/stylesheets/application.css'}
+
+
+  %body
+    .container
+      =yield

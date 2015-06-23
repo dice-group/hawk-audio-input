@@ -1,0 +1,20 @@
+.splash-container
+  .splash-row
+    %img{src: "/images/logo.jpg", style:"margin-bottom:20px"}
+    %form{action: "/search", method: :get, id: "search-form"}
+      .input-group
+        %input#search-input.col-lg-12.form-control{type:"text", placeholder: "Enter Content URL"}
+        #search-button.input-group-addon{:style => "cursor:pointer"}
+          %span.glyphicon.glyphicon-ok
+    %a#start-recording
+      Start
+    %a#stop-recording
+      Stop
+      
+:javascript
+  $("#search-button").click(function(){
+    $("#search-form").submit();
+  })
+  $(document).ready(function(){
+
+  });
