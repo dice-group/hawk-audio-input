@@ -6,7 +6,6 @@ require 'sinatra-websocket'
 
 require 'haml'
 require 'tilt/haml'
-require 'bootstrap-sass'
 
 require 'sass/plugin/rack'
 

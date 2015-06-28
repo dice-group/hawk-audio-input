@@ -23,10 +23,14 @@ function OnlineSpeechRecognition() {
       navigator.getUserMedia({audio: true}, function(stream){
         this.stream=stream
         var context = new AudioContext();
-        var mediaStreamSource = context.createMediaStreamSource(stream);
+
+        var mediaStreamSource = context.createMediaStreamSource(stream)
+
         this.recording = true;
         this.recorder = context.createScriptProcessor(2048, 1, 1);
         this.recorder.onaudioprocess = this.processChunk;
+
+
         mediaStreamSource.connect(this.recorder);
         this.recorder.connect(context.destination);
 
@@ -37,8 +41,10 @@ function OnlineSpeechRecognition() {
   }.bind(this);
 
   this.processChunk = function(streamData) {
-      var left = streamData.inputBuffer.getChannelData(0);
-      this.wsclient.send(this.convertFloat32ToInt16(left));
+      var buffer = streamData.inputBuffer.getChannelData(0);
+      this.wsclient.send(this.convertFloat32ToInt16(buffer));
+
+      drawAmplitude(Math.max.apply(Math, buffer));
   }.bind(this);
 
   this.convertFloat32ToInt16 = function(buffer) {
@@ -55,7 +61,9 @@ function OnlineSpeechRecognition() {
       this.recording=false;
       this.stream.stop();
       this.recorder.disconnect();
-      this.wsclient.send("get_hypothesis")
+      setTimeout(function(){
+        this.wsclient.send("get_hypothesis")
+      }.bind(this),1000);
     }
   }.bind(this);
 }
@@ -112,10 +120,48 @@ function OfflineSpeechRecognition() {
 window.SpeechRecognition = (typeof(webkitSpeechRecognition) != 'undefined') ? new OfflineSpeechRecognition : new OnlineSpeechRecognition
 
 
-$(document).on('click','#start-recording',function(){
-  window.SpeechRecognition.startRecognition()
+$(document).on('click','#toggle-recording',function(){
+  if(window.SpeechRecognition.recording) {
+    window.SpeechRecognition.stopReccognition();
+    drawInactive();
+  } else {
+    window.SpeechRecognition.startRecognition();
+    drawAmplitude(0);
+  }
 })
 
-$(document).on('click','#stop-recording',function(){
-  window.SpeechRecognition.stopReccognition()
-})
+
+var mic_active = new Image();
+mic_active.src = 'images/mic_active.png';
+
+var mic_inactive = new Image();
+mic_inactive.src = 'images/mic_inactive.png';
+
+function drawAmplitude(amplitude) {
+  if(window.SpeechRecognition.recording){
+    var c=document.getElementById("mic-canvas");
+    var ctx=c.getContext("2d");
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    ctx.fillStyle = "#999999";
+    ctx.beginPath();
+    ctx.arc(75,75,30+50*amplitude,0,Math.PI*2);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "#FF1E00";
+    ctx.beginPath();
+    ctx.arc(75,75,30,0,Math.PI*2);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.drawImage(mic_active,50,50,50,50)
+  }
+}
+
+function drawInactive() {
+  var c=document.getElementById("mic-canvas");
+  var ctx=c.getContext("2d");
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.drawImage(mic_inactive,50,50,50,50)
+}

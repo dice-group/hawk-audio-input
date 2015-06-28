@@ -8,4 +8,3 @@ gem 'ruby-libsamplerate'
 
 gem 'haml'
 gem 'sass'
-gem 'bootstrap-sass'

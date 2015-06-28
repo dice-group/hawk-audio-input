@@ -3,18 +3,20 @@
     %img{src: "/images/logo.jpg", style:"margin-bottom:20px"}
     %form{action: "/search", method: :get, id: "search-form"}
       .input-group
-        %input#search-input.col-lg-12.form-control{type:"text", placeholder: "Enter Content URL"}
+        %input#search-input.col-lg-12.form-control{type:"text", placeholder: "E.g. What is the speed of light?"}
         #search-button.input-group-addon{:style => "cursor:pointer"}
-          %span.glyphicon.glyphicon-ok
-    %a#start-recording
-      Start
-    %a#stop-recording
-      Stop
-      
+          %span.fa.fa-search
+
+      #mic-box.text-center
+        %a#toggle-recording{style: 'cursor:pointer'}
+          %canvas#mic-canvas{width:"150", height:"150"}
+
+
 :javascript
   $("#search-button").click(function(){
     $("#search-form").submit();
   })
-  $(document).ready(function(){
 
-  });
+  $(document).ready(function(){
+    drawInactive();
+  })
