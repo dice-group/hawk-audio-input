@@ -1,35 +1,43 @@
+require 'ruby-libsamplerate'
 require 'pocketsphinx-ruby'
+require 'tempfile'
 
 class SpeechToTextProcessor
-  def initialize(file)
-      @file = normalize_audio_file(file)
-      config = Pocketsphinx::Configuration.default
-      config['lw'] = 7.0
-      config['topn'] = 16
-      config['fillprob'] = 1.0e-06
-      config['silprob'] = 0.1
-      config['wip'] = 0.5
-      config['compallsen'] = true
-      config['beam'] = 1.0e-80
-      config['maxhmmpf'] = 30000
-      config['logfn'] = File.join([Dir.pwd,'log','pocket_sphinx.log'])
+  attr_reader :hyp
 
-      @decoder = Pocketsphinx::Decoder.new(config)
+  def initialize
+      @resampler = SRC::Simple.new(44100, 16000, 1)
+      @configuration = Pocketsphinx::Configuration.default
+      @decoder = Pocketsphinx::Decoder.new(@configuration)
+      @file = Tempfile.new(["micinput",".raw"],:encoding => 'ascii-8bit')
   end
 
-  def get_hypothesis
+  def write(data)
+    @file.write downsample(data)
+    @file.flush
+  end
+
+  def analyze
     @decoder.decode(@file.path)
     @decoder.hypothesis
   end
 
+  def reset
+    @file = Tempfile.new(["micinput",".raw"],:encoding => 'ascii-8bit')
+  end
+
+  def close
+    @file.close
+    @file.unlink
+  end
+
   private
-
-  def normalize_audio_file(file)
-    input = Tempfile.new(['input','.wav'])
-    input.write(file.read)
-
-    output = Tempfile.new(['output','.wav'])
-    system("sox #{input.path} -r 16k #{output.path} channels 1")
-    output
+  def downsample(data)
+    data = data.unpack("s*")
+    data = SRC::Convert.short_to_float(data)
+    data = @resampler.resample data
+    data = SRC::Convert.float_to_short(data)
+    data = data.pack("s*")
+    data
   end
 end

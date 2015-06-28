@@ -1,6 +1,8 @@
+require 'thin'
+
 require 'sinatra'
 require 'sinatra/reloader' if development?
-require "sinatra/json"
+require 'sinatra-websocket'
 
 require 'haml'
 require 'tilt/haml'

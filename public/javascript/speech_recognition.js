@@ -1,6 +1,14 @@
 function OnlineSpeechRecognition() {
-  this.recorder = null;
+  this.wsclient = new WebSocket('ws://localhost:9292/speech_to_text');
+  this.wsclient.onopen = function() {
+  };
+
+  this.wsclient.onmessage = function(msg) {
+    $('#search-input').val(msg.data);
+  };
+
   this.recording = false;
+  this.recorder = null;
   this.stream = null;
 
   navigator.getUserMedia = (
@@ -16,59 +24,67 @@ function OnlineSpeechRecognition() {
         this.stream=stream
         var context = new AudioContext();
         var mediaStreamSource = context.createMediaStreamSource(stream);
-        this.recorder = new Recorder(mediaStreamSource);
         this.recording = true;
-        console.log(this);
-        this.recorder.record();
+        this.recorder = context.createScriptProcessor(2048, 1, 1);
+        this.recorder.onaudioprocess = this.processChunk;
+        mediaStreamSource.connect(this.recorder);
+        this.recorder.connect(context.destination);
+
       }.bind(this),function(error){
         console.log(err)
       });
     }
   }.bind(this);
 
+  this.processChunk = function(streamData) {
+      var left = streamData.inputBuffer.getChannelData(0);
+      this.wsclient.send(this.convertFloat32ToInt16(left));
+  }.bind(this);
+
+  this.convertFloat32ToInt16 = function(buffer) {
+    l = buffer.length;
+    buf = new Int16Array(l);
+    while (l--) {
+      buf[l] = Math.min(1, buffer[l])*0x7FFF;
+    }
+    return buf.buffer;
+  }
+
   this.stopReccognition = function() {
-    console.log(this);
     if(this.recording){
       this.recording=false;
-      this.recorder.stop();
       this.stream.stop();
-      this.recorder.exportWAV(function (sound_blob) {
-        var fd = new FormData();
-        fd.append('fname', 'speech.wav');
-        fd.append('data', sound_blob);
-        $.ajax({
-            type: 'POST',
-            url: '/speech_to_text',
-            data: fd,
-            processData: false,
-            contentType: false,
-            success: function(data) {
-              $('#search-input').val(data.hypothesis);
-            }
-        })
-      });
+      this.recorder.disconnect();
+      this.wsclient.send("get_hypothesis")
     }
   }.bind(this);
 }
 
+
+
+
+
 function OfflineSpeechRecognition() {
     this.transcript = ""
+
+    this.recording = false;
+
     this.recognition = new webkitSpeechRecognition();
     this.recognition.continuous = true;
     this.recognition.interimResults = true;
     this.recognition.lang = "en-US";
 
     this.recognition.onstart = function(){
-      console.log("Startet")
-    }
+      this.recording=true;
+    }.bind(this)
+
+    this.recognition.onend = function() {
+      this.recording=false;
+    }.bind(this)
 
     this.recognition.onerror = function(e) {
-      //console.log(e)
-    }
-
-    this.recognition.onspeechend = function(e) {
-      console.log("end");
-    }
+      this.recording=false;
+    }.bind(this)
 
     this.recognition.onresult = function(event) {
       interim_transcript = ""
@@ -80,16 +96,17 @@ function OfflineSpeechRecognition() {
         }
       }
       $('#search-input').val(this.transcript + interim_transcript);
+      setTimeout(this.stopReccognition,2000);
     }.bind(this)
 
     this.startRecognition = function(){
       this.transcript = "";
       this.recognition.start();
-    }
+    }.bind(this);
 
     this.stopReccognition = function(){
       this.recognition.stop();
-    }
+    }.bind(this);
 }
 
 window.SpeechRecognition = (typeof(webkitSpeechRecognition) != 'undefined') ? new OfflineSpeechRecognition : new OnlineSpeechRecognition
