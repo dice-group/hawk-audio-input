@@ -8,3 +8,7 @@ gem 'ruby-libsamplerate'
 
 gem 'haml'
 gem 'sass'
+
+gem 'httparty'
+
+gem 'sparql-client'

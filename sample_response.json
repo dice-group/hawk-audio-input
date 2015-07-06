@@ -1,0 +1,175 @@
+{
+    "POS_tags": [
+        {
+            "POS": "VBD",
+            "key": "died"
+        },
+        {
+            "POS": "NN",
+            "key": "distaster"
+        },
+        {
+            "POS": "NN",
+            "key": "columbia"
+        },
+        {
+            "POS": "WP",
+            "key": "Who"
+        }
+    ],
+    "annotation": [
+        {
+            "annotations": [
+                "http://dbpedia.org/ontology/deathPlace"
+            ],
+            "label": "died"
+        },
+        {
+            "annotations": [
+                "http://dbpedia.org/ontology/Agent"
+            ],
+            "label": "Who"
+        }
+    ],
+    "answer": [
+        {
+            "URI": "http://dbpedia.org/resource/Laurel_Clark",
+            "abstract": "Laurel Blair Salton Clark (March 10, 1961 \u2013 February 1, 2003) was a medical doctor, United States Navy Captain, NASA astronaut and Space Shuttle mission specialist who died in the Space Shuttle Columbia disaster.",
+            "comment": "Laurel Blair Salton Clark (March 10, 1961 \u2013 February 1, 2003) was a medical doctor, United States Navy Captain, NASA astronaut and Space Shuttle mission specialist who died in the Space Shuttle Columbia disaster.",
+            "thumbnail": "http://commons.wikimedia.org/wiki/Special:FilePath/Laurel_Clark,_NASA_photo_portrait_in_blue_suit.jpg?width=300"
+        }
+    ],
+    "final_sparql_base64": "UFJFRklYIHRleHQ6PGh0dHA6Ly9qZW5hLmFwYWNoZS5vcmcvdGV4dCM+IApTRUxFQ1QgRElTVElOQ1QgP3Byb2ogV0hFUkUgewogP3Byb2ogdGV4dDpxdWVyeSAoPGh0dHA6Ly9kYnBlZGlhLm9yZy9vbnRvbG9neS9hYnN0cmFjdD4gJ2NvbHVtYmlhfjEgQU5EIGRpc3Rhc3Rlcn4xJyAxMDAwKS4gCj9wcm9qIDxodHRwOi8vZGJwZWRpYS5vcmcvb250b2xvZ3kvZGVhdGhQbGFjZT4gP2NvbnN0LiAKfQpMSU1JVCAx",
+    "input_question": "Who died at the columbia distaster",
+    "named_entities": [],
+    "pruning_messages": [
+        {
+            "label": "Number of Queries before pruning",
+            "value": 81
+        },
+        {
+            "label": "Underdefined pruned",
+            "value": 21
+        },
+        {
+            "label": "SPARQL queries containing no project variable pruned",
+            "value": 4
+        },
+        {
+            "label": "SPARQL queries containing too many nodes as text lookup pruned",
+            "value": 6
+        },
+        {
+            "label": "SPARQL queries with more than one predicate between the same variables pruned",
+            "value": 0
+        },
+        {
+            "label": "SPARQL queries with more than one type per variable pruned",
+            "value": 0
+        },
+        {
+            "label": "SPARQL queries without connected BGP pruned",
+            "value": 1
+        },
+        {
+            "label": "SPARQL queries containing cycic triple pruned",
+            "value": 0
+        },
+        {
+            "label": "SPARQL queries without bound variables pruned",
+            "value": 0
+        },
+        {
+            "label": "SPARQL queries without text filter over existing variables pruned",
+            "value": 12
+        },
+        {
+            "label": "SPARQL queries with unbound triples pruned",
+            "value": 0
+        },
+        {
+            "label": "SPARQL queries with mismatching types pruned",
+            "value": 0
+        },
+        {
+            "label": "SPARQL queries with disjoint classes pruned",
+            "value": 0
+        },
+        {
+            "label": "Number of Queries after pruning",
+            "value": 37
+        },
+        {
+            "label": "Cardinality of question results",
+            "value": 1
+        },
+        {
+            "label": "Number of sofar executed queries",
+            "value": 10326
+        }
+    ],
+    "tree_final": {
+        "children": [
+            {
+                "label": "Who"
+            },
+            {
+                "children": [
+                    {
+                        "label": "columbia"
+                    }
+                ],
+                "label": "distaster"
+            }
+        ],
+        "label": "died"
+    },
+    "tree_full": {
+        "children": [
+            {
+                "label": "Who"
+            },
+            {
+                "children": [
+                    {
+                        "children": [
+                            {
+                                "label": "the"
+                            },
+                            {
+                                "label": "columbia"
+                            }
+                        ],
+                        "label": "distaster"
+                    }
+                ],
+                "label": "at"
+            }
+        ],
+        "label": "died"
+    },
+    "tree_pruned": {
+        "children": [
+            {
+                "label": "Who"
+            },
+            {
+                "children": [
+                    {
+                        "label": "columbia"
+                    }
+                ],
+                "label": "distaster"
+            }
+        ],
+        "label": "died"
+    }
+}
+
+query = "
+      PREFIX dbp: <http://dbpedia.org/resource/>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+      SELECT ?name WHERE {
+        dbp:Laurel_Clark rdfs:label ?name.
+        FILTER(langMatches(lang(?name), 'EN'))
+}"

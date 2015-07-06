@@ -1,23 +1,16 @@
-require './speech_to_text_processor'
-module Prototype
+module HawkAudioInput
   class App < Sinatra::Base
 
     set :server, 'thin'
     set :sockets, {}
 
     get '/' do
-      @content = "Hey there"
       haml :index
     end
 
-    #post '/speech_to_text' do
-    #  processor = SpeechToTextProcessor.new(params["data"][:tempfile])
-    #  json hypothesis: processor.get_hypothesis
-    #end
-
     get '/speech_to_text' do
       if !request.websocket?
-        erb :index
+        haml :index
       else
         request.websocket do |ws|
           ws.onopen do
@@ -34,10 +27,30 @@ module Prototype
           end
           ws.onclose do
             settings.sockets[ws].close
+            settings.sockets[ws] = nil
             settings.sockets.delete(ws)
           end
         end
       end
     end
+
+    get '/search' do
+      @query = params['q']
+      @uuid = Hawk::Connector.search(@query)
+      haml :search
+    end
+
+    get '/status/:uuid' do
+      @resp = Hawk::Connector.status(params[:uuid])
+
+      content_type :json
+      if @resp.final?
+        @resp.as_json.to_json
+      else
+        nil.to_json
+      end
+    end
+
+
   end
 end

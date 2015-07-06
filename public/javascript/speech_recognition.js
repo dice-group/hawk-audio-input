@@ -1,10 +1,9 @@
 function OnlineSpeechRecognition() {
   this.wsclient = new WebSocket('ws://localhost:9292/speech_to_text');
-  this.wsclient.onopen = function() {
-  };
 
   this.wsclient.onmessage = function(msg) {
     $('#search-input').val(msg.data);
+    $('#search-form').submit();
   };
 
   this.recording = false;
@@ -61,6 +60,7 @@ function OnlineSpeechRecognition() {
       this.recording=false;
       this.stream.stop();
       this.recorder.disconnect();
+      $("#search-input").val("Analyzing Speech")
       setTimeout(function(){
         this.wsclient.send("get_hypothesis")
       }.bind(this),1000);
@@ -114,6 +114,7 @@ function OfflineSpeechRecognition() {
 
     this.stopReccognition = function(){
       this.recognition.stop();
+      $("#search-form").submit();
     }.bind(this);
 }
 
@@ -145,17 +146,17 @@ function drawAmplitude(amplitude) {
 
     ctx.fillStyle = "#999999";
     ctx.beginPath();
-    ctx.arc(75,75,30+50*amplitude,0,Math.PI*2);
+    ctx.arc(50,50,25+25*amplitude,0,Math.PI*2);
     ctx.closePath();
     ctx.fill();
 
     ctx.fillStyle = "#FF1E00";
     ctx.beginPath();
-    ctx.arc(75,75,30,0,Math.PI*2);
+    ctx.arc(50,50,25,0,Math.PI*2);
     ctx.closePath();
     ctx.fill();
 
-    ctx.drawImage(mic_active,50,50,50,50)
+    ctx.drawImage(mic_active,25,25,50,50)
   }
 }
 
@@ -163,5 +164,5 @@ function drawInactive() {
   var c=document.getElementById("mic-canvas");
   var ctx=c.getContext("2d");
   ctx.clearRect(0, 0, c.width, c.height);
-  ctx.drawImage(mic_inactive,50,50,50,50)
+  ctx.drawImage(mic_inactive,25,25,50,50)
 }

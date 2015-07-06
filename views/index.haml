@@ -1,22 +1,19 @@
-.splash-container
-  .splash-row
-    %img{src: "/images/logo.jpg", style:"margin-bottom:20px"}
-    %form{action: "/search", method: :get, id: "search-form"}
-      .input-group
-        %input#search-input.col-lg-12.form-control{type:"text", placeholder: "E.g. What is the speed of light?"}
-        #search-button.input-group-addon{:style => "cursor:pointer"}
-          %span.fa.fa-search
+.container
+  .splash-container
+    .splash-row
+      %img{src: "/images/logo.jpg", style:"margin-bottom:20px"}
+      %form{action: "/search", method: :get, id: "search-form"}
+        .input-group
+          %input#search-input.col-lg-12.form-control{type:"text", name: 'q', placeholder: "E.g. What is the speed of light?"}
+          #search-button.input-group-addon{:style => "cursor:pointer"}
+            %span.fa.fa-search
 
-      #mic-box.text-center
-        %a#toggle-recording{style: 'cursor:pointer'}
-          %canvas#mic-canvas{width:"150", height:"150"}
+        #mic-box.text-center
+          %a#toggle-recording{style: 'cursor:pointer'}
+            %canvas#mic-canvas{width:"100", height:"100"}
 
 
 :javascript
-  $("#search-button").click(function(){
-    $("#search-form").submit();
-  })
-
   $(document).ready(function(){
     drawInactive();
   })

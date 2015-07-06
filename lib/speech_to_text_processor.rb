@@ -28,7 +28,8 @@ class SpeechToTextProcessor
 
   def close
     @file.close
-    @file.unlink
+    @file.unlink  
+    @decoder = nil
   end
 
   private
