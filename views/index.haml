@@ -8,12 +8,6 @@
           #search-button.input-group-addon{:style => "cursor:pointer"}
             %span.fa.fa-search
 
-        #mic-box.text-center
-          %a#toggle-recording{style: 'cursor:pointer'}
-            %canvas#mic-canvas{width:"100", height:"100"}
-
-
-:javascript
-  $(document).ready(function(){
-    drawInactive();
-  })
+      .mic-box.text-center
+        %img#mic-active{src: "/images/mic_active.png", style: "display:none"}
+        %img#mic-inactive{src: "/images/mic_inactive.png"}

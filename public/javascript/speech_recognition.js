@@ -1,14 +1,15 @@
 function OnlineSpeechRecognition() {
-  this.wsclient = new WebSocket('ws://localhost:9292/speech_to_text');
+  this.wsclient = new WebSocket("ws://" + location.host + "/speech_to_text");
 
   this.wsclient.onmessage = function(msg) {
     $('#search-input').val(msg.data);
-    $('#search-form').submit();
+    //$('#search-form').submit();
   };
 
   this.recording = false;
   this.recorder = null;
   this.stream = null;
+  this.mediaStreamSource = null;
 
   navigator.getUserMedia = (
     navigator.getUserMedia ||
@@ -20,21 +21,25 @@ function OnlineSpeechRecognition() {
   this.startRecognition = function() {
     if(!this.recording) {
       navigator.getUserMedia({audio: true}, function(stream){
+        $("#mic-active").toggle();
+        $("#mic-inactive").toggle();
+
         this.stream=stream
         var context = new AudioContext();
 
-        var mediaStreamSource = context.createMediaStreamSource(stream)
+        this.mediaStreamSource = context.createMediaStreamSource(stream)
 
         this.recording = true;
         this.recorder = context.createScriptProcessor(2048, 1, 1);
         this.recorder.onaudioprocess = this.processChunk;
 
 
-        mediaStreamSource.connect(this.recorder);
+        this.mediaStreamSource.connect(this.recorder);
         this.recorder.connect(context.destination);
 
       }.bind(this),function(error){
-        console.log(err)
+          console.log("foo");
+
       });
     }
   }.bind(this);
@@ -42,8 +47,6 @@ function OnlineSpeechRecognition() {
   this.processChunk = function(streamData) {
       var buffer = streamData.inputBuffer.getChannelData(0);
       this.wsclient.send(this.convertFloat32ToInt16(buffer));
-
-      drawAmplitude(Math.max.apply(Math, buffer));
   }.bind(this);
 
   this.convertFloat32ToInt16 = function(buffer) {
@@ -59,7 +62,9 @@ function OnlineSpeechRecognition() {
     if(this.recording){
       this.recording=false;
       this.stream.stop();
+      this.mediaStreamSource.disconnect();
       this.recorder.disconnect();
+
       $("#search-input").val("Analyzing Speech")
       setTimeout(function(){
         this.wsclient.send("get_hypothesis")
@@ -83,15 +88,21 @@ function OfflineSpeechRecognition() {
     this.recognition.lang = "en-US";
 
     this.recognition.onstart = function(){
+      $("#mic-active").toggle();
+      $("#mic-inactive").toggle();
       this.recording=true;
     }.bind(this)
 
     this.recognition.onend = function() {
       this.recording=false;
+      $("#mic-active").toggle();
+      $("#mic-inactive").toggle();
     }.bind(this)
 
     this.recognition.onerror = function(e) {
       this.recording=false;
+      $("#mic-active").toggle();
+      $("#mic-inactive").toggle();
     }.bind(this)
 
     this.recognition.onresult = function(event) {
@@ -104,7 +115,6 @@ function OfflineSpeechRecognition() {
         }
       }
       $('#search-input').val(this.transcript + interim_transcript);
-      setTimeout(this.stopReccognition,2000);
     }.bind(this)
 
     this.startRecognition = function(){
@@ -121,48 +131,12 @@ function OfflineSpeechRecognition() {
 window.SpeechRecognition = (typeof(webkitSpeechRecognition) != 'undefined') ? new OfflineSpeechRecognition : new OnlineSpeechRecognition
 
 
-$(document).on('click','#toggle-recording',function(){
+$(document).on('click','.mic-box',function(){
   if(window.SpeechRecognition.recording) {
     window.SpeechRecognition.stopReccognition();
-    drawInactive();
+    $("#mic-active").toggle();
+    $("#mic-inactive").toggle();
   } else {
     window.SpeechRecognition.startRecognition();
-    drawAmplitude(0);
   }
 })
-
-
-var mic_active = new Image();
-mic_active.src = 'images/mic_active.png';
-
-var mic_inactive = new Image();
-mic_inactive.src = 'images/mic_inactive.png';
-
-function drawAmplitude(amplitude) {
-  if(window.SpeechRecognition.recording){
-    var c=document.getElementById("mic-canvas");
-    var ctx=c.getContext("2d");
-    ctx.clearRect(0, 0, c.width, c.height);
-
-    ctx.fillStyle = "#999999";
-    ctx.beginPath();
-    ctx.arc(50,50,25+25*amplitude,0,Math.PI*2);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = "#FF1E00";
-    ctx.beginPath();
-    ctx.arc(50,50,25,0,Math.PI*2);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.drawImage(mic_active,25,25,50,50)
-  }
-}
-
-function drawInactive() {
-  var c=document.getElementById("mic-canvas");
-  var ctx=c.getContext("2d");
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.drawImage(mic_inactive,25,25,50,50)
-}
