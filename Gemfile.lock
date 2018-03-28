@@ -24,8 +24,8 @@ GEM
     net-http-persistent (2.9.4)
     pocketsphinx-ruby (0.3.0)
       ffi (>= 1.9)
-    rack (1.6.1)
-    rack-protection (1.5.3)
+    rack (1.6.2)
+    rack-protection (1.5.5)
       rack
     rack-test (0.6.3)
       rack (>= 1.0)
