@@ -1,7 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.3.8)
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
     backports (3.6.4)
     daemons (1.2.2)
     em-websocket (0.3.8)
@@ -24,6 +25,7 @@ GEM
     net-http-persistent (2.9.4)
     pocketsphinx-ruby (0.3.0)
       ffi (>= 1.9)
+    public_suffix (5.0.0)
     rack (1.6.2)
     rack-protection (1.5.5)
       rack
